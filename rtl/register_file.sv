@@ -21,7 +21,19 @@ module register_file (
     input  logic        write_enable
 );
 
-    // TODO: Delete the following line and implement this module.
-    ref_register_file golden(.*);
+    logic [31:0] registers [31:0];
+
+    // Asynchronous reads — x0 always returns 0
+    always_comb begin
+        read_data1 = (read_address1 == 5'b0) ? 32'b0 : registers[read_address1];
+        read_data2 = (read_address2 == 5'b0) ? 32'b0 : registers[read_address2];
+    end
+
+    // Synchronous write — never write to x0
+    always_ff @(posedge clk) begin
+        if (write_enable && write_address != 5'b0) begin
+            registers[write_address] <= write_data;
+        end
+    end
 
 endmodule
